@@ -9,8 +9,7 @@ def part1(input)
     .map(&:chomp)
     .map{|line| [line[0], line[1...line.length]]}
     .map {|(direction, *rest)| [(direction == "L" ? "-" : "+"), rest.join().to_i, direction]}
-    .each do |operator, n, direction|
-      puts direction
+    .each do |operator, n|
       dial_position = dial_position.send(operator, n)
       count += 1 if dial_position % 100 == 0
     end
@@ -19,7 +18,21 @@ def part1(input)
 end
 
 def part2(input)
-  # TODO
+  count = 0
+  dial_position = 50
+
+  input.lines
+    .map(&:chomp)
+    .map{|line| [line[0], line[1...line.length]]}
+    .map {|(direction, *rest)| [(direction == "L" ? "-" : "+"), rest.join().to_i, direction]}
+    .each do |operator, n|
+      n.times do
+        dial_position = dial_position.send(operator, 1)
+        count += 1 if dial_position % 100 == 0
+      end
+    end
+
+  count
 end
 
 real_input = File.read('day01-input.txt')
