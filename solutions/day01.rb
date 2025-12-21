@@ -6,13 +6,13 @@ def part1(input)
   dial_position = 50
 
   input.lines
-    .map(&:chomp)
-    .map{|line| [line[0], line[1...line.length]]}
-    .map {|(direction, *rest)| [(direction == "L" ? "-" : "+"), rest.join().to_i, direction]}
-    .each do |operator, n|
-      dial_position = dial_position.send(operator, n)
-      count += 1 if dial_position % 100 == 0
-    end
+       .map(&:chomp)
+       .map { |line| [line[0], line[1...line.length]] }
+       .map { |(direction, *rest)| [(direction == 'L' ? '-' : '+'), rest.join.to_i, direction] }
+       .each do |operator, n|
+    dial_position = dial_position.send(operator, n)
+    count += 1 if (dial_position % 100).zero?
+  end
 
   count
 end
@@ -22,15 +22,15 @@ def part2(input)
   dial_position = 50
 
   input.lines
-    .map(&:chomp)
-    .map{|line| [line[0], line[1...line.length]]}
-    .map {|(direction, *rest)| [(direction == "L" ? "-" : "+"), rest.join().to_i, direction]}
-    .each do |operator, n|
-      n.times do
-        dial_position = dial_position.send(operator, 1)
-        count += 1 if dial_position % 100 == 0
-      end
+       .map(&:chomp)
+       .map { |line| [line[0], line[1...line.length]] }
+       .map { |(direction, *rest)| [(direction == 'L' ? '-' : '+'), rest.join.to_i, direction] }
+       .each do |operator, n|
+    n.times do
+      dial_position = dial_position.send(operator, 1)
+      count += 1 if (dial_position % 100).zero?
     end
+  end
 
   count
 end

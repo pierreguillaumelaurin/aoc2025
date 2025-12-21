@@ -3,6 +3,7 @@
 
 def invalid?(id)
   return false if id.length.odd?
+
   middle_index = id.length / 2
   id[0...middle_index] == id[middle_index..id.length]
 end
@@ -14,19 +15,19 @@ end
 
 def part1(input)
   input
-    .split(",")
-    .map{_1.split("-").map(&:to_i)}
+    .split(',')
+    .map { _1.split('-').map(&:to_i) }
     .sum do |floor, ceil|
-      (floor..ceil).select{invalid?(_1.to_s)}.sum
+      (floor..ceil).select { invalid?(_1.to_s) }.sum
     end
 end
 
 def part2(input)
   input
-    .split(",")
-    .map{_1.split("-").map(&:to_i)}
+    .split(',')
+    .map { _1.split('-').map(&:to_i) }
     .sum do |floor, ceil|
-      (floor..ceil).select{invalid_invalid?(_1.to_s)}.sum
+      (floor..ceil).select { invalid_invalid?(_1.to_s) }.sum
     end
 end
 
