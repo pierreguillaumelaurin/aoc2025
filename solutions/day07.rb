@@ -1,28 +1,62 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-def part1(input)
-  grid = input.lines.map(&:chomp).map { _1.split('') }
+class DAG
+  def initialize(grid)
+    @grid = grid
+    @transposed_grid = grid.transpose
+    @graph = Hash.new { |hash, key| hash[key] = Set.new }
 
-  beam_positions = Hash.new { |hash, key| hash[key] = Set.new }
-  starting_column = grid[0].find_index { _1 == 'S' }
-  beam_positions[0].add(starting_column)
+    starting_column = @grid[0].find_index { _1 == 'S' }
+    build_graph([0, starting_column])
+  end
 
-  count = 0
+  def nodes
+    @graph.keys
+  end
 
-  (1...grid.length).each do |row_index|
-    beam_positions[row_index - 1].each do |i|
-      if grid[row_index][i] == '^'
-        beam_positions[row_index].add(i - 1) if i - 1 >= 0 && i - 1 < grid[row_index].length
-        beam_positions[row_index].add(i + 1) if i + 1 >= 0 && i + 1 < grid[row_index].length
-        count += 1
-      else
-        beam_positions[row_index].add(i)
-      end
+  private
+
+  def build_graph(start, visited = Set.new)
+    return if start.nil? || visited.include?(start)
+
+    visited.add(start)
+
+    neighbors = find_neighbors(start)
+
+    @graph[start] += neighbors
+
+    return nil if neighbors.empty?
+
+    neighbors.each do |neighbor|
+      build_graph(neighbor, visited)
     end
   end
 
-  count
+  def find_neighbors((x, y))
+    if @grid[x][y] == 'S'
+      [find_next_tachyon([x, y])].compact
+    else
+      left_neighbor = find_next_tachyon([x, y - 1])
+      right_neighbor = find_next_tachyon([x, y + 1])
+      [left_neighbor, right_neighbor].compact
+    end
+  end
+
+  def find_next_tachyon((x, y))
+    return nil if x.negative? || x >= @grid.length
+
+    next_tachyon_x = @transposed_grid[y].each_with_index.find_index { |element, index| element == '^' && index > x }
+
+    [next_tachyon_x, y] if next_tachyon_x
+  end
+end
+
+def part1(input)
+  grid = input.lines.map(&:chomp).map { _1.split('') }
+  dag = DAG.new(grid)
+
+  dag.nodes.length - 1
 end
 
 def part2(input)
