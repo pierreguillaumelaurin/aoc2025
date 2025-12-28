@@ -8,11 +8,28 @@ class DAG
     @graph = Hash.new { |hash, key| hash[key] = Set.new }
 
     starting_column = @grid[0].find_index { _1 == 'S' }
-    build_graph([0, starting_column])
+    @root = [0, starting_column]
+    build_graph(@root)
+
+    @paths_count = Hash.new(0)
+    @paths_count[@root] = 1
+    build_number_of_paths_map
   end
 
   def nodes
     @graph.keys
+  end
+
+  def build_number_of_paths_map
+    topologically_sorted_nodes = @graph.keys.sort { |a, b| a[0] <=> b[0] }
+    topologically_sorted_nodes.each do |neighbor|
+      parents = @graph.select { |_, v| v.include?(neighbor) }.keys
+      @paths_count[neighbor] += parents.sum { |parent| @paths_count[parent] }
+    end
+  end
+
+  def number_of_paths
+    @paths_count.values.sum
   end
 
   private
@@ -60,7 +77,9 @@ def part1(input)
 end
 
 def part2(input)
-  # TODO
+  grid = input.lines.map(&:chomp).map { _1.split('') }
+  dag = DAG.new(grid)
+  dag.number_of_paths
 end
 
 real_input = File.read('day07-input.txt')
@@ -68,3 +87,4 @@ real_input = File.read('day07-input.txt')
 puts "Part 1: #{part1(real_input)}"
 # answer 1581
 puts "Part 2: #{part2(real_input)}"
+# 73007003089792
