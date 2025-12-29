@@ -38,7 +38,24 @@ def part1(input)
 end
 
 def part2(input)
-  # TODO
+  boxes = input.lines.map(&:chomp).map { _1.split(',').map(&:to_i) }
+  edges = (0...boxes.length).to_a.combination(2).to_a
+  edges.sort_by! do |(first_idx, second_idx)|
+    hypothenuse(*boxes[first_idx].zip(boxes[second_idx]).map { |first, second| first - second })
+  end
+
+  parents = (0...boxes.length).to_a
+
+  circuits = boxes.length
+
+  edges.each do |first, second|
+    next if root(first, parents) == root(second, parents)
+
+    merge(first, second, parents)
+    circuits -= 1
+
+    break boxes[first].first * boxes[second].first if circuits == 1
+  end
 end
 
 real_input = File.read('day08-input.txt')
