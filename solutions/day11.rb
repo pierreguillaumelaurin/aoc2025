@@ -26,7 +26,7 @@ def part1(input)
          .lines
          .map(&:chomp)
          .map { it.split(': ') }
-         .to_h { |node, neighbors| [node, neighbors.split("\s")] }
+         .to_h { |node, neighbors| [node, neighbors.split] }
 
   count_paths('you', 'out', tree)
 end
@@ -36,7 +36,7 @@ def part2(input)
          .lines
          .map(&:chomp)
          .map { it.split(': ') }
-         .to_h { |node, neighbors| [node, neighbors.split("\s")] }
+         .to_h { |node, neighbors| [node, neighbors.split] }
 
   count_selected_paths('svr', 'out', tree)
 end

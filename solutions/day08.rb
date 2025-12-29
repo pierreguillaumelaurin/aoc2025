@@ -16,29 +16,25 @@ def merge(a, b, parents)
 end
 
 def part1(input)
-  # A thousand times we need to
-  # 1. find the 2 junction boxes that are the closest together
-  # 2. check if one (or both) are part of a network
-  # 3. connect the networks together
-  # Then, we multiply the 3 largest circuits
   boxes = input.lines.map(&:chomp).map { _1.split(',').map(&:to_i) }
-  edges = boxes.each_with_index.each_slice(2).map { |(_, first_i), (__, second_i)| [first_i, second_i] }
+  edges = (0...boxes.length).to_a.combination(2).to_a
   edges.sort_by! do |(first_idx, second_idx)|
     hypothenuse(*boxes[first_idx].zip(boxes[second_idx]).map { |first, second| first - second })
   end
 
   parents = (0...boxes.length).to_a
 
+  edges[...1000].each do |first, second|
+    merge(first, second, parents)
+  end
+
   sizes = [0] * boxes.length
 
-  boxes.each do |box|
-    sizes
+  (0...boxes.length).each do |i|
+    sizes[root(i, parents)] += 1
   end
-  ##  networks
-  #    .sort { |a, b| a.count <=> b.count }
-  #    .reverse
-  #    .take(3)
-  #    .reduce(1) { |network, product| product * network }
+
+  sizes.sort.reverse.take(3).reduce(1) { |n, product| n * product }
 end
 
 def part2(input)
