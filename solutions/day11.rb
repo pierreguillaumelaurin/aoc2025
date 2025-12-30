@@ -7,18 +7,14 @@ def count_paths(source, destination, tree)
   tree[source].sum { count_paths(it, destination, tree) }
 end
 
-def count_selected_paths(source, destination, tree, visited = Set.new)
-  return 0 if visited.include?(source)
+def dfs(source, destination, tree, visited = nil)
+  visited ||= []
+  return if visited.include?(source)
+  return visited << destination if source == destination
 
-  path_so_far = visited.union([source])
+  tree[source].each { dfs(it, destination, tree, visited) }
 
-  if tree[source].include?(destination)
-    return 1 if path_so_far.include?('dac') && path_so_far.include?('fft')
-
-    return 0
-  end
-
-  tree[source].sum { count_selected_paths(it, destination, tree, path_so_far) }
+  visited << source
 end
 
 def part1(input)
@@ -31,14 +27,40 @@ def part1(input)
   count_paths('you', 'out', tree)
 end
 
+def run_path_counting(topological_order, tree, count_hash)
+  topological_order.each do |node|
+    tree[node]&.each do |child|
+      count_hash[child] += count_hash[node]
+    end
+  end
+end
+
 def part2(input)
   tree = input
          .lines
          .map(&:chomp)
-         .map { it.split(': ') }
+         .map { |line| line.split(': ') }
          .to_h { |node, neighbors| [node, neighbors.split] }
 
-  count_selected_paths('svr', 'out', tree)
+  topological_order = dfs('svr', 'out', tree).reverse
+  all_nodes = tree.keys | tree.values.flatten
+
+  # Segment 1: svr -> fft (which comes first in my input)
+  count1 = all_nodes.to_h { |node| [node, node == 'svr' ? 1 : 0] }
+  run_path_counting(topological_order, tree, count1)
+  paths1 = count1['fft']
+
+  # Segment 2: fft -> dag
+  count2 = all_nodes.to_h { |node| [node, node == 'fft' ? 1 : 0] }
+  run_path_counting(topological_order, tree, count2)
+  paths2 = count2['dac']
+
+  # Segment 3: dag -> out
+  count3 = all_nodes.to_h { |node| [node, node == 'dac' ? 1 : 0] }
+  run_path_counting(topological_order, tree, count3)
+  paths3 = count3['out']
+
+  paths1 * paths2 * paths3
 end
 
 real_input = File.read('day11-input.txt')
