@@ -1,8 +1,43 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+def parse_target(input)
+  input[1...-1].split('').map { it == '#' ? 1 : 0 }
+end
+
+def parse_button(input)
+  input[1...-1].split(',').map(&:to_i)
+end
+
+def bfs(target, buttons)
+  queue = [[[0] * target.length, 0]]
+  visited = Set.new
+
+  until queue.empty?
+    state, count = queue.shift
+    next if visited.include?(state)
+
+    visited.add(state)
+
+    return count if target == state
+
+    buttons.each do |button|
+      next_state = state.dup
+      button.each do |index|
+        next_state[index] ^= 1
+      end
+
+      queue << [next_state, count + 1]
+    end
+  end
+end
+
 def part1(input)
-  # TODO
+  input
+    .lines
+    .map { it.split[...-1] }
+    .map { |(target, *buttons)| [parse_target(target), buttons.map { parse_button(it) }] }
+    .sum { |(target, buttons)| bfs(target, buttons) }
 end
 
 def part2(input)
