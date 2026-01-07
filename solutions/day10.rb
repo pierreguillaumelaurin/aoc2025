@@ -9,6 +9,10 @@ def parse_button(input)
   input[1...-1].split(',').map(&:to_i)
 end
 
+def parse_requirements(input)
+  input[1...-1].split(',').map(&:to_i)
+end
+
 def bfs(target, buttons)
   queue = [[[0] * target.length, 0]]
   visited = Set.new
@@ -41,7 +45,14 @@ def part1(input)
 end
 
 def part2(input)
-  # TODO
+  input
+    .lines
+    .map(&:split)
+    .map do |(target, *buttons, intensity)|
+    [parse_target(target), buttons.map do
+      parse_button(it)
+    end, parse_requirements(intensity)]
+  end
 end
 
 real_input = File.read('day10-input.txt')
